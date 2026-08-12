@@ -11,8 +11,9 @@ services:
     ports:
      - 8000:8000
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
   db:
     image: postgres:18.4-alpine
     environment:
@@ -28,6 +29,19 @@ services:
       interval: 2s
       timeout: 5s
       retries: 30
+
+  migrate:
+    build:
+      context: ./backend
+      target: production
+    command: ["python", "manage.py", "migrate"]
+    volumes:
+     - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+     - glazr-network
 
 volumes:
   db-data:
