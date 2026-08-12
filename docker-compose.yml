@@ -1,0 +1,37 @@
+services:
+
+  backend:
+    build:
+     context: ./backend
+     target: production
+    volumes:
+     - ./backend:/app
+    networks:
+     - glazr-network
+    ports:
+     - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:18.4-alpine
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django
+      POSTGRES_DB: glazr
+    volumes:
+      - db-data:/var/lib/postgresql/
+    networks:
+     - glazr-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "django", "-d", "glazr"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  glazr-network: {}
