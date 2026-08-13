@@ -4,6 +4,7 @@ from typing import Any
 from django.db import transaction
 
 from catalogue.models import Donut
+from glazr.messaging import publish_event
 from orders.exceptions import (
     DonutNotFound,
     DonutUnavailable,
@@ -63,6 +64,8 @@ def create_order(items: list[dict[str, Any]]) -> Order:
         ]
     )
 
+    publish_event("order.created", {"order_id": order.id, "total": order.total})
+
     return order
 
 
@@ -81,4 +84,7 @@ def dispatch_order(order: Order) -> Order:
 
     order.status = Order.Status.DISPATCHED
     order.save(update_fields=["status"])
+
+    publish_event("order.dispatched", {"order_id": order.id})
+
     return order

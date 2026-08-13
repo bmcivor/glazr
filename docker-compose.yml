@@ -77,6 +77,29 @@ services:
     networks:
      - glazr-network
 
+  redis:
+    image: redis:8-alpine
+    networks:
+     - glazr-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  consumer:
+    build:
+      context: ./backend
+      target: production
+    command: ["python", "manage.py", "run_consumer"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+     - glazr-network
+
 volumes:
   db-data:
     driver: local

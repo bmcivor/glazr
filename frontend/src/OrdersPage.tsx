@@ -27,7 +27,9 @@ export default function OrdersPage() {
   }
 
   if (orders === null) {
-    return <p>{error ? `Could not load orders: ${error}` : "Loading orders…"}</p>;
+    return (
+      <p>{error ? `Could not load orders: ${error}` : "Loading orders…"}</p>
+    );
   }
 
   if (orders.length === 0) return <p>No orders yet.</p>;
