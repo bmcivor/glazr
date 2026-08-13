@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "glazr"
+version = "0.0.0"
+description = "A Django application which allows customers to order gourmet donuts and have them delivered by drone."
+readme = "README.md"
+authors = [
+    { name = "Blake McIvor" },
+]
+requires-python = ">=3.14"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Software Development",
+]
+keywords = ["glazr", "dronut"]
+dependencies = [
+    "django==6.0.8",
+    "psycopg2-binary==2.9.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/bmcivor/glazr"
+Repository = "https://github.com/bmcivor/glazr"
+Issues = "https://github.com/bmcivor/glazr/issues"
+
+[project.scripts]
+
+[dependency-groups]
+dev = [
+    "django-stubs==6.0.8",
+    "mypy==2.3.0",
+    "pytest==9.0.2",
+    "pytest-django==4.12.0",
+    "types-psycopg2==2.9.21.20260724",
+    "ruff==0.16.1",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "glazr.settings"
+python_files = ["tests.py", "test_*.py", "*_test.py"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "glazr.settings"

@@ -1,0 +1,85 @@
+services:
+
+  backend:
+    build:
+     context: ./backend
+     target: production
+    volumes:
+     - ./backend:/app
+    networks:
+     - glazr-network
+    ports:
+     - 8000:8000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  db:
+    image: postgres:18.4-alpine
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django
+      POSTGRES_DB: glazr
+    volumes:
+      - db-data:/var/lib/postgresql/
+    networks:
+     - glazr-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "django", "-d", "glazr"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  migrate:
+    build:
+      context: ./backend
+      target: production
+    command: ["python", "manage.py", "migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+     - glazr-network
+
+  frontend:
+    build:
+      context: ./frontend
+      target: base
+    volumes:
+     - ./frontend:/app
+     - /app/node_modules
+    networks:
+     - glazr-network
+    ports:
+     - 5173:5173
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # Profiled services are excluded from a plain `docker compose up`.
+  # `docker compose run <service>` enables a service's own profiles, so the
+  # scripts in scripts/ reach these without naming a profile.
+
+  backend-test:
+    profiles: ["test"]
+    build:
+     context: ./backend
+     target: test
+    networks:
+     - glazr-network
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  frontend-test:
+    profiles: ["test"]
+    build:
+      context: ./frontend
+      target: test
+    networks:
+     - glazr-network
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  glazr-network: {}
