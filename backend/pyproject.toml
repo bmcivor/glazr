@@ -24,6 +24,7 @@ classifiers = [
 keywords = ["glazr", "dronut"]
 dependencies = [
     "django==6.0.8",
+    "djangorestframework==3.17.1",
     "psycopg2-binary==2.9.12",
 ]
 
@@ -59,6 +60,10 @@ select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
+
+[[tool.mypy.overrides]]
+module = ["rest_framework.*"]
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "glazr.settings"
