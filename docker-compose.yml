@@ -35,8 +35,6 @@ services:
       context: ./backend
       target: production
     command: ["python", "manage.py", "migrate"]
-    volumes:
-     - ./backend:/app
     depends_on:
       db:
         condition: service_healthy
@@ -55,6 +53,29 @@ services:
     ports:
      - 5173:5173
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # Profiled services are excluded from a plain `docker compose up`.
+  # `docker compose run <service>` enables a service's own profiles, so the
+  # scripts in scripts/ reach these without naming a profile.
+
+  backend-test:
+    profiles: ["test"]
+    build:
+     context: ./backend
+     target: test
+    networks:
+     - glazr-network
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  frontend-test:
+    profiles: ["test"]
+    build:
+      context: ./frontend
+      target: test
+    networks:
+     - glazr-network
 
 volumes:
   db-data:
