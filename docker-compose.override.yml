@@ -1,0 +1,14 @@
+services:
+
+  migrate:
+    volumes:
+     - ./backend:/app
+
+  backend-test:
+    volumes:
+     - ./backend:/app
+
+  frontend-test:
+    volumes:
+     - ./frontend:/app
+     - /app/node_modules
