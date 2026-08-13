@@ -3,6 +3,7 @@ from rest_framework import mixins, viewsets
 
 from catalogue.models import Donut
 from catalogue.serializers import DonutSerializer
+from glazr.messaging import publish_event
 
 
 class DonutViewSet(
@@ -38,3 +39,17 @@ class DonutViewSet(
             queryset = queryset.filter(available=available.lower() == "true")
 
         return queryset
+
+    def perform_create(self, serializer: DonutSerializer) -> None:
+        donut = serializer.save()
+        publish_event(
+            "donut.created",
+            {"donut_id": donut.id, "donut_code": donut.donut_code},
+        )
+
+    def perform_update(self, serializer: DonutSerializer) -> None:
+        donut = serializer.save()
+        publish_event(
+            "donut.updated",
+            {"donut_id": donut.id, "donut_code": donut.donut_code},
+        )

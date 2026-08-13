@@ -133,3 +133,12 @@ STATIC_URL = "static/"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
 }
+
+
+# REDIS
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+
+EVENT_CHANNEL = os.getenv("EVENT_CHANNEL", "glazr.events")
+
+INBOUND_CHANNEL = os.getenv("INBOUND_CHANNEL", "glazr.inbound")
