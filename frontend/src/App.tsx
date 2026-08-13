@@ -1,6 +1,10 @@
 import { useState } from "react";
+
 import DonutsPage from "./DonutsPage";
-type View = "donuts" | "orders";
+import OrderPage from "./OrderPage";
+import OrdersPage from "./OrdersPage";
+
+type View = "donuts" | "order" | "orders";
 
 export default function App() {
   const [view, setView] = useState<View>("donuts");
@@ -11,10 +15,13 @@ export default function App() {
 
       <nav>
         <button onClick={() => setView("donuts")}>Donuts</button>
+        <button onClick={() => setView("order")}>Order</button>
         <button onClick={() => setView("orders")}>Orders</button>
       </nav>
 
-      {view === "donuts" ? <DonutsPage /> : <p>orders here</p>}
+      {view === "donuts" && <DonutsPage />}
+      {view === "order" && <OrderPage />}
+      {view === "orders" && <OrdersPage />}
     </main>
   );
 }
