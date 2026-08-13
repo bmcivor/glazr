@@ -13,7 +13,6 @@ FROM base AS production
 
 RUN uv sync --frozen --no-dev --no-install-project
 
-COPY . .
 USER 1000:1000
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
