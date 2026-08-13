@@ -6,11 +6,11 @@ from catalogue.models import Donut
 from orders.exceptions import (
     DonutNotFound,
     DonutUnavailable,
-    InvalidQuantity,
     InvalidOrder,
+    InvalidQuantity,
     InvalidStatusChange,
 )
-from orders.models import Order
+from orders.models import Order, OrderItem
 from orders.services import (
     create_order,
     dispatch_order,
@@ -99,9 +99,12 @@ class TestCreateOrder(TestCase):
         Expectations: Rejected, and no order is persisted.
         """
         self.homer.available = False
+        self.homer.save()
 
         with self.assertRaises(DonutUnavailable):
             create_order([{"donut_code": self.homer.donut_code, "quantity": 2}])
+
+        assert Order.objects.count() == 0
 
     def test_rejects_a_quantity_of_zero_or_less(self) -> None:
         """
@@ -128,17 +131,16 @@ class TestCreateOrder(TestCase):
         Expectations: Rejected, and neither the order nor the valid line
         survives.
         """
-        order = create_order(
-            [
-                {"donut_code": self.homer.donut_code, "quantity": 2},
-                {"donut_code": "UNKNOWN DONUT", "quantity": 3},
-            ]
-        )
+        with self.assertRaises(DonutNotFound):
+            create_order(
+                [
+                    {"donut_code": self.homer.donut_code, "quantity": 2},
+                    {"donut_code": "UNKNOWN_DONUT", "quantity": 3},
+                ]
+            )
 
         assert Order.objects.count() == 0
-
-        line = order.items.get(donut=self.homer)
-        assert len(line) == 0
+        assert OrderItem.objects.count() == 0
 
 
 class TestDispatchOrder(TestCase):
